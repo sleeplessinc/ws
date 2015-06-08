@@ -3,12 +3,19 @@
 Browser
 -------
 
-See test.html
+	See test.html
 
 
 Server
 -------
 
-See test.js
+	See test.js
+
+
+Test
+-------
+
+	npm install
+	node sleepless-ws.js
 
 

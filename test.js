@@ -1,7 +1,7 @@
 
 httpd = require('http').createServer(function(req, res) {
-	res.writeHead(200);
-	res.end(require("fs").readFileSync("./test.html");
+	res.writeHead(200)
+	res.end(require("fs").readFileSync("./test.html"));
 });
 
 require("./sleepless-ws.js").listen(httpd, function(new_client) {

@@ -1,0 +1,10 @@
+{
+  "name": "sleepless-ws",
+  "version": "1.0.0",
+  "description" : "Client side websockets support",
+  "author": "Joe Hitchens <joe@sleepless.com> (sleepless.com)",
+  "license": {
+    "type": "MIT"
+  },
+  "repository": "git://github.com/sleeplessinc/ws.git"
+}

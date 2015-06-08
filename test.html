@@ -1,18 +1,16 @@
 <!doctype html>
 <html>
 <body>
-Hi.
-<div id=out></div>
+<pre id=out></pre>
 <script>
 	
 	wrt = function(s) {
 		var e = I("out")
-		e.innerHTML = s+"<br>\n"+e.innerHTML
+		e.innerHTML = s+"\n"+e.innerHTML
 		console.log(s)
 	} 
 
 	msgs = function(m) {
-		wrt("MSG: "+o2j(m))
 		m.reply({nick:"Bob"})
 
 	}
@@ -21,15 +19,14 @@ Hi.
 		if(s == "connect") {
 			setTimeout(function() {
 				con.send({msg:"sup?"}, function(r) {
-					wrt("server said, "+o2j(r))
 				})
 			}, 1000)
 		}
-		wrt("CTRL: "+s)
+		wrt("CONTROL MSG: "+s)
 	}
 
 	setTimeout(function() {
-		ws.dbg = log;
+		ws.dbg = wrt;
 		ws.connect(msgs, ctrls)
 	}, 1 * 1000)
 

@@ -23,6 +23,7 @@ if((typeof process) === 'undefined') {
 			var msgsWaiting = {};
 
 			// this discards msgs that have been waiting too long for a response
+			/*
 			var ticker = setInterval(function() {
 				for(var k in msgsWaiting) {
 					var msg = msgsWaiting[k];
@@ -32,12 +33,13 @@ if((typeof process) === 'undefined') {
 					}
 				}
 			}, 10 * 1000);
+			*/
 
 
 			// called when socket closes
 			socket.onclose = function() {
 				ws.dbg("disconnected from "+url)
-				clearInterval(ticker);
+				//clearInterval(ticker);
 				for(var k in msgsWaiting) {
 					var msg = msgsWaiting[k];
 					delete msgsWaiting[k];
@@ -124,14 +126,16 @@ if((typeof process) === 'undefined') {
 			cb_ctrl("connect");
 		}
 
-		return sock
+		return socket
 	}
 
 }
 else  {
 	// node (server)
 
-	ws.listen = function(httpd, connection_cb) {
+	require("sleepless")
+
+	ws.listen = function(httpd, connect_cb) {
 		var websocket = require("websocket")
 		var wsd = new websocket.server({
 			httpServer: httpd,
@@ -169,7 +173,7 @@ else  {
 			};
 
 
-			var accept = function(receive_cb) {
+			var accept = function(cb_msg, cb_ctrl) {
 
 				socket.on("message", function(x) {
 
@@ -220,6 +224,11 @@ else  {
 						cb(m.response)
 					}
 				})
+
+				socket.on("close", function() {
+					cb_ctrl("disconnect")
+				});
+
 			}
 
 			var client = {
@@ -231,36 +240,13 @@ else  {
 			// back reference
 			socket.client = client;
 
-			ws.clients[client_id] = client;
-
 			log("connect");
 
-			//bcast({msg:"user_connect", client_id:client_id}, client);
-
-			//socket.on("message", recv);
-
-			socket.on("close", function() {
-				log("close");
-				delete ws.clients[client_id]
-				//bcast({msg:"user_disconnect", client_id:client_id});
-			});
-
-			connectin_cb(client);
+			connect_cb(client);
 
 		});
 
 		return wsd;
-	}
-
-
-	// send a msg to all clients (except optionally, except_client)
-	ws.broadcast = function(m, except_client) {
-		for(var k in ws.clients) {
-			var client = ws.clients[k];
-			if(client != except_client) {
-				client.send(m);
-			}
-		}
 	}
 
 	module.exports = ws;

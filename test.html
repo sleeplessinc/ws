@@ -1,9 +1,24 @@
 <!doctype html>
 <html>
 <body>
-<script src="./sleepless-ws.js"></script>
 <script>
+	
+	log = function(s) { console.log(s) } 
+
+	msgs = function(m) {
+		log("MSG: "+m)
+	}
+
+	ctrls = function(m) {
+		log("CTRL: "+m)
+	}
+
+	setTimeout(function() {
+		ws.connect(msgs, ctrls)
+	}, 1 * 1000)
+
 </script>
+
 
 
 

@@ -8,6 +8,7 @@
   },
   "repository": "git://github.com/sleeplessinc/ws.git",
   "dependencies": {
-    "websocket": "^1.0.19"
+    "websocket": "^1.0.19",
+    "sleepless": "^2.0.0"
   }
 }

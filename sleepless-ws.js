@@ -263,20 +263,10 @@ else  {
 		}
 	}
 
+	module.exports = ws;
+
+	if(require.main === module) {
+		require('./test.js')
+	}
 }
-
-/*
-	ws.listen(httpd, function(new_client) {
-
-		var msg_in = function(m) {
-		}
-
-		new_client.accept(msg_in) 
-
-		new_client.send("hi")
-	})
-
-*/
-
-
 

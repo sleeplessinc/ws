@@ -17,5 +17,5 @@ Test
 
 	npm install
 	node sleepless-ws.js
-
+	open http://localhost:12345/
 

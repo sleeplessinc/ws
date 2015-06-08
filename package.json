@@ -1,7 +1,7 @@
 {
   "name": "sleepless-ws",
   "version": "1.0.0",
-  "description": "Client side websockets support",
+  "description": "Minimalist websockets support for client and server",
   "author": "Joe Hitchens <joe@sleepless.com> (sleepless.com)",
   "license": {
     "type": "MIT"

@@ -22,24 +22,10 @@ if((typeof process) === 'undefined') {
 			// a place for holding msgs that need a response
 			var msgsWaiting = {};
 
-			// this discards msgs that have been waiting too long for a response
-			/*
-			var ticker = setInterval(function() {
-				for(var k in msgsWaiting) {
-					var msg = msgsWaiting[k];
-					if(msg.ts < (time() - 15)) {
-						cb_ctrl("msg_timeout", msg.msg_id)
-						delete msgsWaiting[k]
-					}
-				}
-			}, 10 * 1000);
-			*/
-
 
 			// called when socket closes
 			socket.onclose = function() {
 				ws.dbg("disconnected from "+url)
-				//clearInterval(ticker);
 				for(var k in msgsWaiting) {
 					var msg = msgsWaiting[k];
 					delete msgsWaiting[k];
@@ -149,10 +135,6 @@ else  {
 
 			var msgsWaiting = {};
 
-			var log = function(s) {
-				ws.dbg(client_id+": "+s);
-			};
-
 			var send = function(m, cb) {
 				// ensure that every outgoing message has a msg_id
 				if(m.msg_id === undefined) {
@@ -237,8 +219,6 @@ else  {
 
 			// back reference
 			socket.client = client;
-
-			log("connect");
 
 			connect_cb(client);
 

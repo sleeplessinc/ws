@@ -102,7 +102,7 @@ if((typeof process) === 'undefined') {
 
 				// ensure that every outgoing message has a msg_id
 				if(msg_id === undefined) {
-					msg_id = "C_"+(ws.seq += 1);
+					msg_id = "C"+(ws.seq += 1);
 					m.msg_id = msg_id
 				}
 
@@ -110,11 +110,11 @@ if((typeof process) === 'undefined') {
 				if(cb) {
 					m.cb = cb;
 					m.ts = time();
-					msgsWaiting[msg_id] = o;
+					msgsWaiting[msg_id] = m;
 				}
 
 				// JSON encode outgoing msg and send it off
-				var j = o2j(o);
+				var j = o2j(m);
 				ws.dbg(">--out--> "+j);
 				socket.send(j);
 			}
@@ -123,10 +123,8 @@ if((typeof process) === 'undefined') {
 				send: send,
 			}
 
-			cb_ctrl("connect");
+			cb_ctrl("connect", sock);
 		}
-
-		return socket
 	}
 
 }
@@ -158,16 +156,16 @@ else  {
 			var send = function(m, cb) {
 				// ensure that every outgoing message has a msg_id
 				if(m.msg_id === undefined) {
-					m.msg_id = "S_"+(ws.seq += 1)
+					m.msg_id = "S"+(ws.seq += 1)
 				}
 
 				if(cb) {
 					m.ts = time();			// used for timing out msgs that have been waiting for too long
-					msgsWaiting[m.msg_id] = o;
+					msgsWaiting[m.msg_id] = m;
 				}
 
 				var j = o2j(m);
-				ws.dbg("  <-- "+client_id+" --< "+j);
+				ws.dbg("  <-- ("+client_id+") --< "+j);
 				socket.sendUTF(j);
 				m.cb = cb;
 			};

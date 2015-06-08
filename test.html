@@ -1,19 +1,35 @@
 <!doctype html>
 <html>
 <body>
+Hi.
+<div id=out></div>
 <script>
 	
-	log = function(s) { console.log(s) } 
+	wrt = function(s) {
+		var e = I("out")
+		e.innerHTML = s+"<br>\n"+e.innerHTML
+		console.log(s)
+	} 
 
 	msgs = function(m) {
-		log("MSG: "+m)
+		wrt("MSG: "+o2j(m))
+		m.reply({nick:"Bob"})
+
 	}
 
-	ctrls = function(m) {
-		log("CTRL: "+m)
+	ctrls = function(s, con) {
+		if(s == "connect") {
+			setTimeout(function() {
+				con.send({msg:"sup?"}, function(r) {
+					wrt("server said, "+o2j(r))
+				})
+			}, 1000)
+		}
+		wrt("CTRL: "+s)
 	}
 
 	setTimeout(function() {
+		ws.dbg = log;
 		ws.connect(msgs, ctrls)
 	}, 1 * 1000)
 

@@ -11,9 +11,9 @@ ws = {
 if((typeof process) === 'undefined') {
 	// browser (client)
 
-	ws.connect = function(cb_msg, cb_ctrl) {
+	ws.connect = function(cb_msg, cb_ctrl, tls) {
 
-		var url = "ws://"+document.location.host
+		var url = (tls ? "wss" : "ws")+"://"+document.location.host
 		var socket = new WebSocket(url)
 		socket.onopen = function() {
 			// connection to server established

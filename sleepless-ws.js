@@ -215,6 +215,7 @@ else  {
 				client_id: client_id,
 				send: send,
 				accept: accept,
+				req: req
 			};
 
 			// back reference

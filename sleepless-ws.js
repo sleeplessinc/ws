@@ -212,6 +212,7 @@ else  {
 			}
 
 			var client = {
+				socket: socket,
 				client_id: client_id,
 				send: send,
 				accept: accept,
@@ -222,6 +223,8 @@ else  {
 			socket.client = client;
 
 			connect_cb(client);
+
+			// XXX if connect_cb() doesn't call client.accept(), is a connecting left hanging?
 
 		});
 

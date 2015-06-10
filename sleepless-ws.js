@@ -222,9 +222,8 @@ else  {
 			// back reference
 			socket.client = client;
 
+			// connect_cb() should either accept or close client.socket
 			connect_cb(client);
-
-			// XXX if connect_cb() doesn't call client.accept(), is a connecting left hanging?
 
 		});
 

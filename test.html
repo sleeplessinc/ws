@@ -39,8 +39,8 @@
 		con.onmessage = function(m) {
 			wrt("onmessage "+o2j(m))
 		}
-		con.onerror = function(m) {
-			wrt("onerror "+o2j(m))
+		con.onerror = function(a, b, c) {
+			wrt("onerror "+o2j(a)+" "+b+" " +c)
 		}
 		con.send({msg:"system status"}, function(o) {
 			wrt("got response "+o2j(o))

@@ -16,6 +16,7 @@ if((typeof process) === 'undefined') {
 		var url = (document.location.protocol == "https:" ? "wss" : "ws")+"://"+document.location.host+"/"+path
 		var waiting = {}
 		var queue_out = []
+		var retries = 1;
 
 		var establish = function() {
 			ws.dbg("establish");
@@ -24,7 +25,14 @@ if((typeof process) === 'undefined') {
 			con.socket.onclose = function() {
 				con.socket = null
 				//waiting = {}					// discard any waiting msgs 
-				setTimeout(establish, 2000)		// attempt to reestablish contact in 2 seconds
+				if(retries < 10) {
+					ws.dbg("retry "+retries);
+					setTimeout(establish, retries * 1000)		// attempt to reestablish contact in 2 seconds
+					retries += 1;
+				}
+				else {
+					ws.dbg("giving up");
+				}
 			}
 			con.socket.onmessage = function(evt) {
 				var j = evt.data		// raw message is a utf8 string
@@ -65,8 +73,8 @@ if((typeof process) === 'undefined') {
 					con.onmessage(m);
 				}
 			},
-			con.socket.onerror = function() {
-				con.onerror.apply(arguments)
+			con.socket.onerror = function(a) {
+				con.onerror.apply(this, arguments)
 			}
 		}
 

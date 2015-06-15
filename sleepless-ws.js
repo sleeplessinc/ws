@@ -21,7 +21,10 @@ if((typeof process) === 'undefined') {
 		var establish = function() {
 			ws.dbg("establish");
 			con.socket = new WebSocket(url)
-			con.socket.onopen = drain
+            con.socket.onopen = function() {
+                retries = 1;
+                drain()
+            }
 			con.socket.onclose = function() {
 				con.socket = null
 				//waiting = {}					// discard any waiting msgs 

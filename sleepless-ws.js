@@ -11,106 +11,104 @@ ws = {
 if((typeof process) === 'undefined') {
 	// browser (client)
 
-	ws.connect = function(path, cb_msg, cb_ctrl) {
+	ws.open = function(path) {
 
 		var url = (document.location.protocol == "https:" ? "wss" : "ws")+"://"+document.location.host+"/"+path
-		var socket = new WebSocket(url)
-		socket.onopen = function() {
-			// connection to server established
-			ws.dbg("connected to "+url)
+		var waiting = {}
+		var queue_out = []
 
-			// a place for holding msgs that need a response
-			var msgsWaiting = {};
-
-
-			// called when socket closes
-			socket.onclose = function() {
-				ws.dbg("disconnected from "+url)
-				for(var k in msgsWaiting) {
-					var msg = msgsWaiting[k];
-					delete msgsWaiting[k];
-				}
-				cb_ctrl("disconnect");
+		var establish = function() {
+			ws.dbg("establish");
+			con.socket = new WebSocket(url)
+			con.socket.onopen = drain
+			con.socket.onclose = function() {
+				con.socket = null
+				//waiting = {}					// discard any waiting msgs 
+				setTimeout(establish, 2000)		// attempt to reestablish contact in 2 seconds
 			}
-
-
-			// messages from server arrive here
-			socket.onmessage = function(evt) {
-
+			con.socket.onmessage = function(evt) {
 				var j = evt.data		// raw message is a utf8 string
 				ws.dbg("  <--in--< "+j)
 				var m = j2o(j)			// convert JSON to object
 				if(typeof m !== "object") {
-					ws.dbg("garbled msg: "+j);
-					return;
+					con.onerror("incoming msg garbled: "+j);
 				}
-
-				if(m.msg) {
-					// this is a server initiated msg (not a reply to my own msg)
-
-					// set up a reply function.
-					m.reply = function(data) {
-						send({ msg_id: m.msg_id, response: data })
-					}
-
-					// pass msg on for processing
-					cb_msg(m);
+				else
+				if(m.error) {
+					con.onerror(m)
 				}
 				else
 				if(m.response) {
-					// this msg is a response to a client initiated msg
-
-					var msg_id = m.msg_id
-					var msg = msgsWaiting[msg_id]
-					if(!msg) {
-						ws.dbg("mysterious reply: "+msg_id)
-						return
+					// response to a client initiated msg
+					var mid = m.msg_id
+					var mm = waiting[mid]
+					if(mm) {
+						delete waiting[mid]		// remove from waiting area
+						if(mm.cb) {
+							mm.cb(m)		// route response to associated call back
+						}
+						else {
+							ws.dbg("reply ignored: "+mid)
+						}
 					}
-					delete msgsWaiting[msg_id]
-
-					// route response to associated call back
-					var cb = msg.cb;
-					if(!cb) {
-						ws.dbg("reply ignored: "+msg_id)
-						return
+					else {
+						ws.dbg("unexpected reply: "+mid)
 					}
-
-					// pass msg reply on for processing
-					cb(m.response)
 				}
-			}
-
-
-			// outgoing messages go through here
-			var send = function(m, cb) {
-
-				var msg_id = m.msg_id;
-
-				// ensure that every outgoing message has a msg_id
-				if(msg_id === undefined) {
-					msg_id = "C"+(ws.seq += 1);
-					m.msg_id = msg_id
+				else {
+					// server initiated msg (not a reply to my own msg)
+					// set up a reply function.
+					m.reply = function(data) {
+						con.send({ msg_id: m.msg_id, response: data })
+					}
+					// pass msg on for processing
+					con.onmessage(m);
 				}
-
-				// presence of cb() means sender wants a reply
-				if(cb) {
-					m.cb = cb;
-					m.ts = time();
-					msgsWaiting[msg_id] = m;
-				}
-
-				// JSON encode outgoing msg and send it off
-				var j = o2j(m);
-				ws.dbg(">--out--> "+j);
-				socket.send(j);
+			},
+			con.socket.onerror = function() {
+				con.onerror.apply(arguments)
 			}
-
-			var sock = {
-				send: send,
-			}
-
-			cb_ctrl("connect", sock);
 		}
+
+		var drain = function() {
+			ws.dbg("drain");
+			if(con.socket) {
+				while(queue_out.length > 0) {
+					var m = queue_out.shift()
+					var j = o2j(m);
+					ws.dbg(">--out-->  "+j)
+					con.socket.send(j);
+					if(m.cb) {
+						// presence of cb() means sender wants a reply
+						waiting[m.msg_id] = m;
+					}
+				}
+			}
+			else {
+				establish()
+			}
+		}
+
+		var send = function(m, cb) {
+			var mid = m.msg_id;
+			if(mid === undefined) {
+				mid = "C"+(ws.seq += 1);
+				m.msg_id = mid
+			}
+			m.cb = cb || null;
+			m.ts = time();
+			queue_out.push(m)
+			drain()
+		}
+
+		var con = {
+			socket: null,
+			send: send,
+			onerror: function(){},
+			onmessage: function(){},
+		}
+
+		return con
 	}
 
 }

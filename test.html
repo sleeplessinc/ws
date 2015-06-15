@@ -10,6 +10,7 @@
 		console.log(s)
 	} 
 
+	/*
 	msgs = function(m) {
 		m.reply({nick:"Bob"})
 
@@ -29,6 +30,22 @@
 		ws.dbg = wrt;
 		ws.connect("/", msgs, ctrls)
 	}, 1 * 1000)
+	*/
+	setTimeout(function() {
+		ws.dbg = wrt;
+		wrt("connecting");	
+		con = ws.open("/wsrpc1.1/")
+		wrt("got a con");	
+		con.onmessage = function(m) {
+			wrt("onmessage "+o2j(m))
+		}
+		con.onerror = function(m) {
+			wrt("onerror "+o2j(m))
+		}
+		con.send({msg:"system status"}, function(o) {
+			wrt("got response "+o2j(o))
+		})
+	}, 1000)
 
 </script>
 

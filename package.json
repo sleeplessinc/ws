@@ -1,6 +1,6 @@
 {
   "name": "sleepless-ws",
-  "version": "2.0.0",
+  "version": "3.0.0",
   "description": "Minimalist websockets support for client and server",
   "author": "Joe Hitchens <joe@sleepless.com> (sleepless.com)",
   "license": {

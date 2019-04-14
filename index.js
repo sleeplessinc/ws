@@ -161,6 +161,11 @@ else  {
 				m.cb = cb;
 			};
 
+			var ssend = function( str, cb ) {
+				send( { message: str }, function(r) {
+					cb(r.response);
+				});
+			};
 
 			var accept = function(cb_msg, cb_ctrl) {
 
@@ -181,6 +186,10 @@ else  {
 						m.reply = function(data) {
 							send({ msg_id: m.msg_id, response: data, });
 						}
+						
+						m.sreply = function( str ) {
+							m.reply( { response: str } );
+						};
 
 						// set up an error-reply function.
 						m.error = function(err) {
@@ -224,6 +233,7 @@ else  {
 				socket: socket,
 				client_id: client_id,
 				send: send,
+				ssend: ssend,
 				accept: accept,
 				req: req
 			};
